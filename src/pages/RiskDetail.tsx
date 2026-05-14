@@ -2,14 +2,22 @@ import { motion } from 'motion/react';
 import { Factory, Workflow, Package, Cpu, MapPin, Clock, AlertTriangle, ShieldCheck, ChevronRight, Download } from 'lucide-react';
 
 interface RiskDetailProps {
+<<<<<<< HEAD
   node: any;
 }
 
 export default function RiskDetail({ node }: RiskDetailProps) {
+=======
+  nodeId: string;
+}
+
+export default function RiskDetail({ nodeId }: RiskDetailProps) {
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
   const handleExport = async () => {
     const res = await fetch('/api/generate-report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+<<<<<<< HEAD
       body: JSON.stringify({
   title: `Strategic Risk Analysis: ${node?.id}`,
   nodeInfo: {
@@ -25,12 +33,32 @@ export default function RiskDetail({ node }: RiskDetailProps) {
     ]
   ]
 })
+=======
+      body: JSON.stringify({ 
+        title: `Strategic Risk Analysis: Xinghua Electronics`, 
+        nodeInfo: {
+          name: 'Xinghua Electronics Co.',
+          region: 'Shenzhen, PRC',
+          classification: 'Tier-4 Semiconductor Supplier'
+        },
+        data: [
+          ['Xinghua Electronics (CN)', 'Tier-4 / Primary Node', '8.4'],
+          ['Global Semi (TW)', 'Tier-3 / Logistics Path', '1.2'],
+          ['Apex Modules (DE)', 'Tier-2 / Sub-System', '2.5'],
+          ['Titan Pro-X (US)', 'Final Assembly Port', '0.8']
+        ]
+      })
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
     });
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
+<<<<<<< HEAD
     a.download = `GlobeSec_Report_${node?.id}.pdf`;
+=======
+    a.download = `GlobeSec_Report_${nodeId}.pdf`;
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
     a.click();
   };
 
@@ -40,6 +68,7 @@ export default function RiskDetail({ node }: RiskDetailProps) {
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10px] font-bold px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 uppercase tracking-widest">TIER-4 SUPPLIER</span>
+<<<<<<< HEAD
             <span className="text-slate-500 font-bold text-[10px] uppercase tracking-widest">• NODE ID: {node?.id}</span>
           </div>
           <h1 className="text-4xl font-serif italic text-white tracking-tight">{node?.id}</h1>
@@ -47,6 +76,15 @@ export default function RiskDetail({ node }: RiskDetailProps) {
             <div className="flex items-center gap-1.5">
               <MapPin size={14} />
               <span className="text-xs font-medium">{node?.name}</span>
+=======
+            <span className="text-slate-500 font-bold text-[10px] uppercase tracking-widest">• NODE ID: {nodeId}</span>
+          </div>
+          <h1 className="text-4xl font-serif italic text-white tracking-tight">Xinghua Electronics Co.</h1>
+          <div className="flex items-center gap-4 text-slate-400">
+            <div className="flex items-center gap-1.5">
+              <MapPin size={14} />
+              <span className="text-xs font-medium">Shenzhen, People's Republic of China</span>
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
             </div>
             <div className="flex items-center gap-1.5">
               <Clock size={14} />
@@ -59,7 +97,11 @@ export default function RiskDetail({ node }: RiskDetailProps) {
           <div className="relative w-16 h-16 flex items-center justify-center">
              <div className="absolute inset-0 rounded-full border-4 border-[#1a1a1a]"></div>
              <div className="absolute inset-0 rounded-full border-4 border-red-500 border-t-transparent animate-pulse"></div>
+<<<<<<< HEAD
              <span className="text-xl font-serif font-bold text-red-500">{node?.riskScore}</span>
+=======
+             <span className="text-xl font-serif font-bold text-red-500">84</span>
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
           </div>
           <div className="flex flex-col">
             <span className="text-[11px] font-bold text-red-500 mb-1 uppercase tracking-widest">CRITICAL RISK</span>

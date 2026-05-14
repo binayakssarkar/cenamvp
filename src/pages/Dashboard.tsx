@@ -3,7 +3,11 @@ import { motion } from 'motion/react';
 import { Activity, AlertTriangle, ShieldCheck, Rss } from 'lucide-react';
 
 interface DashboardProps {
+<<<<<<< HEAD
  onDrillDown: (node: any) => void;
+=======
+  onDrillDown: (nodeId: string) => void;
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
   onMetricClick: (metric: string) => void;
   onIntelClick: (article: any) => void;
   onViewAllIntel: () => void;
@@ -11,6 +15,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, onViewAllIntel, highlightedNodes = [] }: DashboardProps) {
+<<<<<<< HEAD
   const [intelFeed, setIntelFeed] = useState<any[]>([]);const [nodes, setNodes] = useState<any[]>([]);
   const [health, setHealth] = useState<any>(null); const [metrics, setMetrics] = useState<any>(null);
 
@@ -61,6 +66,27 @@ export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, on
 }, []);
 
   
+=======
+  const [intelFeed, setIntelFeed] = useState<any[]>([]);
+  const [health, setHealth] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/intel-feed')
+      .then(res => res.json())
+      .then(data => setIntelFeed(data.articles || []));
+      
+    fetch('/api/health')
+      .then(res => res.json())
+      .then(data => setHealth(data));
+  }, []);
+
+  const nodes = [
+    { id: 'Xinghua Electronics', name: 'SHANGHAI', pos: 'top-[35%] left-[78%]', color: 'bg-red-500', risk: 'CRITICAL' },
+    { id: 'Global Semi', name: 'TAIPEI', pos: 'top-[38%] left-[80%]', color: 'bg-amber-500', risk: 'ELEVATED' },
+    { id: 'Apex Modules', name: 'FRANKFURT', pos: 'top-[25%] left-[48%]', color: 'bg-indigo-500', risk: 'MONITORED' },
+    { id: 'Zenith Logistics', name: 'MUMBAI', pos: 'top-[45%] left-[68%]', color: 'bg-red-500', risk: 'CRITICAL' },
+  ];
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
 
   return (
     <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-[#050505] selection:bg-[#6366f1]/30">
@@ -71,6 +97,7 @@ export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, on
           className="bg-[#0d0d0d] border border-[#1a1a1a] p-5 rounded-xl cursor-pointer hover:border-red-500/30 transition-all group active:scale-[0.98]"
         >
           <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold group-hover:text-red-400 transition-colors">Aggregate Risk Score</p>
+<<<<<<< HEAD
           <h2 className="text-5xl font-serif text-white mt-2">{metrics?.aggregateRisk || 0}<span className="text-lg text-slate-600"> / 100</span></h2>
          <div className="w-full h-1 bg-[#1a1a1a] mt-4 rounded-full overflow-hidden">
   <div
@@ -80,6 +107,12 @@ export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, on
     }}
   />
 </div>
+=======
+          <h2 className="text-5xl font-serif text-white mt-2">72<span className="text-lg text-slate-600"> / 100</span></h2>
+          <div className="w-full h-1 bg-[#1a1a1a] mt-4 rounded-full overflow-hidden">
+            <div className="bg-red-500 h-full w-[72%]"></div>
+          </div>
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
           <p className="text-xs text-red-400 mt-3 font-medium">+4.2% since previous scan</p>
         </div>
 
@@ -88,7 +121,11 @@ export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, on
           className="bg-[#0d0d0d] border border-[#1a1a1a] p-5 rounded-xl cursor-pointer hover:border-amber-500/30 transition-all group active:scale-[0.98]"
         >
           <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold group-hover:text-amber-400 transition-colors">Critical Sanction Hits</p>
+<<<<<<< HEAD
           <h2 className="text-5xl font-serif text-white mt-2">{metrics?.sanctions || 0}</h2>
+=======
+          <h2 className="text-5xl font-serif text-white mt-2">14</h2>
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
           <p className="text-xs text-amber-500 mt-6 italic font-medium">4 entities flagged via OFAC</p>
         </div>
 
@@ -97,9 +134,13 @@ export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, on
           className="bg-[#0d0d0d] border border-[#1a1a1a] p-5 rounded-xl cursor-pointer hover:border-indigo-500/30 transition-all group active:scale-[0.98]"
         >
           <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold group-hover:text-indigo-400 transition-colors">Active Monitoring</p>
+<<<<<<< HEAD
           <h2 className="text-5xl font-serif text-white mt-2">
   {metrics?.monitoring || 0}
 </h2>
+=======
+          <h2 className="text-5xl font-serif text-white mt-2">1,048</h2>
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
           <p className="text-xs text-slate-400 mt-6 font-medium">AIS stream monitoring active</p>
         </div>
 
@@ -148,6 +189,7 @@ export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, on
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAgarhIRNEccoqIbYl3Nrn37hJkfqQ0KdhzaElMr0foMeLjnjRSOLrxbf0x5uYzHWS-op7wpdvORqd0J4HgvvwYNyKDQ4DP7MFfzrnf7OI3lLTVJlBFyJ-zr_L5aGdK1xVyC8Kq1EeqxExLvP11A2OCjGKEloQJv1E1dEgQZQnEWSB8smYikU-qFZwq23BeKmrJ3fWt8h_aog-RkkUHhf3TRueMh91rm-NhcqZrT_NQQ8VETNJ3_pYFI_nmV4Ll-15qLl_Kht--u8" 
               alt="World Map" 
             />
+<<<<<<< HEAD
             {nodes.length === 0 && (
   <div className="absolute inset-0 flex items-center justify-center text-slate-600 text-sm italic">
     Upload a BOM CSV to begin graph analysis.
@@ -155,6 +197,10 @@ export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, on
 )}
             {/* Dynamic Map Nodes */}
             
+=======
+            
+            {/* Dynamic Map Nodes */}
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
             {nodes.map((node) => {
               const isHighlighted = highlightedNodes.includes(node.id);
               return (
@@ -167,7 +213,11 @@ export default function Dashboard({ onDrillDown, onMetricClick, onIntelClick, on
                   }}
                   whileHover={{ scale: 1.1 }}
                   className={`absolute ${node.pos} cursor-pointer z-20 transition-all duration-500`}
+<<<<<<< HEAD
                  onClick={() => onDrillDown(node)}
+=======
+                  onClick={() => onDrillDown(node.id === 'Xinghua Electronics' ? '8824-XHE' : node.id)}
+>>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
                 >
                   <span className={`breathing-dot absolute -top-2 -left-2 w-4 h-4 ${node.color} rounded-full ${isHighlighted ? 'opacity-100 scale-150 animate-ping' : 'opacity-50'}`}></span>
                   <div className={`bg-[#0d0d0d] p-2 border ${isHighlighted ? 'border-white shadow-[0_0_20px_rgba(99,102,241,0.5)]' : 'border-slate-800'} text-[9px] font-mono whitespace-nowrap shadow-2xl rounded-sm hover:border-white transition-all`}>
