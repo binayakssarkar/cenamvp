@@ -10,41 +10,86 @@ import autoTable from 'jspdf-autotable';
 import axios from 'axios';
 import cors from 'cors';
 import dotenv from 'dotenv';
-<<<<<<< HEAD
+import { number } from 'motion';
 dotenv.config();
 
 let uploadedSuppliers: any[] = [];
 
 dotenv.config();
 
-function calculateRiskScore(supplier: any) {
+function calculateRiskScore(
+  supplier: any,
+  newsHits: number,
+  sanctioned: boolean
+) {
+
   let score = 0;
 
-  // High-risk geopolitical regions
-  if (
-    ['China', 'Russia', 'Iran'].includes(
-      supplier.geo_loc
-    )
-  ) {
-    score += 4;
-  }
+  // realtime intelligence signals
+  score += Math.min(newsHits, 5);
 
-  // Taiwan semiconductor exposure
-  if (supplier.geo_loc === 'Taiwan') {
-    score += 3;
-  }
-
-  // Strategic logistics zones
-  if (
-    ['Shanghai', 'Red Sea'].includes(
-      supplier.geo_loc
-    )
-  ) {
-    score += 2;
-  }
+  // sanctions enrichment
+  
 
   return Math.min(score, 10);
 }
+async function geocodeLocation(
+  location: string
+) {
+
+  try {
+
+    const response =
+      await axios.get(
+        'https://api.opencagedata.com/geocode/v1/json',
+        {
+          params: {
+            q: location,
+            key:
+              process.env.GEOCAGE_API_KEY,
+            limit: 1
+          }
+        }
+      );
+
+    const result =
+      response.data.results?.[0];
+
+    if (!result) return null;
+
+if (
+  !result.geometry
+) return null;
+
+const lat =
+  Number(result.geometry.lat);
+
+const lng =
+  Number(result.geometry.lng);
+
+console.log(
+  'GEOCODE:',
+  location,
+  lat,
+  lng
+);
+
+return {
+  lat,
+  lng
+};
+
+  } catch (error) {
+
+    console.error(
+      'GeoCage Error:',
+      error
+    );
+
+    return null;
+  }
+}
+
 
 async function fetchNewsRisk(company: string) {
   try {
@@ -63,11 +108,6 @@ async function fetchNewsRisk(company: string) {
   }
 }
 
-=======
-
-dotenv.config();
-
->>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
 const app = express();
 const PORT = 3000;
 const upload = multer({ storage: multer.memoryStorage() });
@@ -124,7 +164,6 @@ app.get('/api/test-bom', (req, res) => {
 
 // news feed ingestion
 app.get('/api/intel-feed', async (req, res) => {
-<<<<<<< HEAD
 
   try {
 
@@ -225,36 +264,42 @@ app.post('/api/upload-bom', upload.single('bom'), async (req, res) => {
       columns: true,
       skip_empty_lines: true
     });// AUTO CALCULATE RISK SCORES
-for (const supplier of records as any[]) { 
+for (const supplier of records as any[]) {
+ const geoData =
+  await geocodeLocation(
+   `${supplier.vendor_identity}, ${supplier.city}, ${supplier.country}`
+  );
+
+supplier.lat =
+  geoData?.lat || 0;
+
+supplier.lng =
+  geoData?.lng || 0;
+  
+ const newsHits =
+  await fetchNewsRisk(
+    `${supplier.vendor_identity} ${supplier.city} ${supplier.country}`
+  );
 
 const sanctioned =
   await checkSanctions(
     supplier.vendor_identity
   );
 
+const riskScore =
+  calculateRiskScore(
+    supplier,
+    newsHits,
+    sanctioned
+  );
 
-
-  if (sanctioned) {
-  riskScore += 10;
-}
 supplier.sanctioned =
   sanctioned;
-  
-  const newsHits =
-    await fetchNewsRisk(
-      supplier.vendor_identity
-    );
 
-  let riskScore =
-    calculateRiskScore(supplier);
-
-  // Add news-based risk
-  riskScore += Math.min(newsHits, 3);
-
-  supplier.risk_index =
-    Math.min(riskScore, 10);
+supplier.risk_index =
+  riskScore;
 }
-uploadedSuppliers = records as any[];
+
 
     // Store uploaded suppliers in memory
     uploadedSuppliers = records as any[];
@@ -264,94 +309,6 @@ uploadedSuppliers = records as any[];
     if (driver) {
       const session = driver.session();
 
-=======
-  try {
-    const apiKey = process.env.NEWS_API_KEY;
-    
-    // Fallback/Mock data if key is placeholder or real calls fail
-    const mockArticles = [
-      { 
-        id: 'INT-001',
-        title: "New SCOMET restriction on semiconductors in Southeast Asia region.", 
-        source: "Reuters Intl", 
-        time: "04m", 
-        risk: "CRITICAL",
-        impact: "High probability of export tier delays for H1-2024 lithography components.",
-        affectedNodes: ['Xinghua Electronics'],
-        recommendation: "Shift procurement to secondary channel in Taiwan or Germany immediately.",
-        details: "Deep analysis suggests that the new SCOMET restrictions specifically target dual-use semiconductor nodes. Xinghua Electronics is directly impacted by its Tier-4 manufacturing location."
-      },
-      { 
-        id: 'INT-002',
-        title: "Port of Rotterdam reports 12% decrease in throughput; strike imminent.", 
-        source: "OSINT Bureau", 
-        time: "28m", 
-        risk: "ELEVATED",
-        impact: "Potential 2-week delay in European module assembly logistics.",
-        affectedNodes: ['Apex Modules'],
-        recommendation: "Route shipments through Port of Hamburg or initiate air-freight and buffer stock.",
-        details: "Industrial action at Rotterdam is expected to last 72 hours, creating a significant backlog for T2 logistics providers."
-      },
-      { 
-        id: 'INT-003',
-        title: "Vessel 'MARAN GAS' altered course toward restricted zone in Suez.", 
-        source: "AISStream", 
-        time: "1h", 
-        risk: "ELEVATED",
-        impact: "Strategic fuel supply interruption for downstream energy consumers.",
-        affectedNodes: ['Global Semi'],
-        recommendation: "Activate strategic energy reserves and monitor AIS for course re-correction.",
-        details: "Geopolitical tension in the Red Sea has forced course deviations. Real-time satellite tracking indicates a 600nm detour."
-      },
-      { 
-        id: 'INT-004',
-        title: "Weekly SDNR list update processed. 122 entries checked.", 
-        source: "OFAC", 
-        time: "2h", 
-        risk: "STABLE",
-        impact: "Zero matches found in active Tier-1 to Tier-3 supplier entities.",
-        affectedNodes: [],
-        recommendation: "No immediate action required. Batch audit complete.",
-        details: "Routine compliance verification against OFAC Specially Designated Nationals (SDN) list. No relational overlaps found."
-      },
-      { 
-        id: 'INT-005',
-        title: "Zenith Logistics flagged in latest DGFT SCOMET PDF parsing.", 
-        source: "GlobeSec AI", 
-        time: "4h", 
-        risk: "CRITICAL",
-        impact: "Violation of export permit 884-C detected via NLP parsing engine.",
-        affectedNodes: ['Zenith Logistics'],
-        recommendation: "Suspend all active POs with Zenith and initiate legal compliance review.",
-        details: "AI-driven entity resolution identified Zenith as a sub-subsidiary of a sanctioned parent firm during a PDF audit run."
-      }
-    ];
-
-    if (!apiKey || apiKey === "2fdad1f1db2a4d3c897364de25acde0a") {
-       return res.json({ articles: mockArticles });
-    }
-
-    const response = await axios.get(`https://newsapi.org/v2/everything?q=supply+chain+sanctions&apiKey=${apiKey}`).catch(() => ({ data: { articles: mockArticles } }));
-    res.json(response.data);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// BOM Upload and Graph Generation
-app.post('/api/upload-bom', upload.single('bom'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    
-    const records = parse(req.file.buffer.toString(), {
-      columns: true,
-      skip_empty_lines: true
-    });
-
-    const driver = getNeo4j();
-    if (driver) {
-      const session = driver.session();
->>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
       try {
         for (const record of records as any[]) {
           await session.run(`
@@ -371,13 +328,8 @@ app.post('/api/upload-bom', upload.single('bom'), async (req, res) => {
       }
     }
 
-<<<<<<< HEAD
     const supabase = getSupabase();
 
-=======
-    // Also persist metadata to Supabase
-    const supabase = getSupabase();
->>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
     if (supabase) {
       await supabase.from('bom_audit').insert({
         file_name: req.file.originalname,
@@ -386,7 +338,6 @@ app.post('/api/upload-bom', upload.single('bom'), async (req, res) => {
       });
     }
 
-<<<<<<< HEAD
     res.json({
       success: true,
       count: records.length,
@@ -406,15 +357,6 @@ app.post('/api/upload-bom', upload.single('bom'), async (req, res) => {
 app.get('/api/suppliers', (req, res) => {
   res.json(uploadedSuppliers);
 });
-=======
-    res.json({ success: true, count: records.length, simulated: !driver });
-  } catch (error: any) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
->>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
 // chains ingestion audit
 app.get('/api/chains', async (req, res) => {
   try {
@@ -438,7 +380,6 @@ app.get('/api/chains', async (req, res) => {
 });
 
 // alerts
-<<<<<<< HEAD
 app.get('/api/dashboard-metrics', (req, res) => {
 
   const suppliers = uploadedSuppliers || [];
@@ -456,11 +397,11 @@ app.get('/api/dashboard-metrics', (req, res) => {
           ) / totalSuppliers
         ).toFixed(1);
 
-  const criticalCount =
-    suppliers.filter(
-      (s: any) =>
-        Number(s.risk_index) >= 8
-    ).length;
+  const sanctionsCount =
+  suppliers.filter(
+    (s: any) =>
+      s.sanctioned === true
+  ).length;
 
   const monitoredCount =
     suppliers.filter(
@@ -470,29 +411,12 @@ app.get('/api/dashboard-metrics', (req, res) => {
 
   res.json({
     aggregateRisk: avgRisk,
-    sanctions: criticalCount,
+   sanctions: sanctionsCount,
     monitoring: monitoredCount,
     totalSuppliers
   });
 });
 
-=======
-app.get('/api/alerts', async (req, res) => {
-  res.json([
-    { id: 'AL-901', type: 'SANCTION', severity: 'CRITICAL', title: 'Direct hit on Tier-4 Supplier in Shanghai', status: 'UNRESOLVED', time: '12m ago' },
-    { id: 'AL-842', type: 'POLICY', severity: 'ELEVATED', title: 'Lithography Export Control Update', status: 'INVESTIGATING', time: '1h ago' },
-    { id: 'AL-773', type: 'GEOPOLITICAL', severity: 'STABLE', title: 'Rotterdam Port Congestion Index', status: 'RESOLVED', time: '4h ago' }
-  ]);
-});
-
-// reports history (mock)
-app.get('/api/reports', async (req, res) => {
-  res.json([
-    { id: 'REP-001', name: 'Strategic Analysis: Xinghua Electronics', size: '1.2 MB', date: '2024-05-12', type: 'PDF' },
-    { id: 'REP-002', name: 'Monthly Supply Chain Audit - April', size: '4.8 MB', date: '2024-05-01', type: 'PDF' }
-  ]);
-});
->>>>>>> 7a0120031cfcb84f73635221b769299cca853b05
 
 // PDF Generation
 app.post('/api/generate-report', async (req, res) => {

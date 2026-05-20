@@ -24,3 +24,6 @@ export default defineConfig(({mode}) => {
     },
   };
 });
+/// <reference types="vite/client" />
+
+declare module '*.css';
